@@ -1,0 +1,120 @@
+---
+title: "Stat. 651 Homework 2"
+author: "Lydia Gibson"
+format: pdf
+editor: visual
+---
+
+# Chapter 14 Exercises
+
+     
+```{r}
+library(pacman)
+
+p_load(tidyverse, macleish, lubridate, mdsr, DT, palmerpenguins)
+```
+
+
+## Problem 3: 
+The `macleish` package contains weather data collected every 10 minutes in 2015 from two weather stations in Whately, Massachusetts. 
+
+Using the `ggplot2` package, create a data graphic that displays the average temperature over each 10-minute interval (`temperature`) as a function of time (`when`) from the `whately_2015` dataframe. Create annotations to include context about the four seasons: the date of the vernal and autumnal equinoxes, and the summer and winter solstices.
+
+
+```{r}
+#whately_2015 %>% select(when, temperature)
+
+seasons_2015 <- tibble(
+    when = (ymd(c("2015 March 20", "2015 June 21", "2015 September 23", "2015 December 21"))),
+    season = c("Spring", "Summer", "Fall", "Winter")
+)
+#seasons_2015
+
+whately_plot <- whately_2015 %>% select(when, temperature) %>% 
+  ggplot(aes(y = temperature, x = as.Date(when))) +
+  geom_vline(data = seasons_2015, color = "darkgray", aes( xintercept = as.Date(when) ) ) +
+  geom_text(data = seasons_2015, aes(y = 33, label = season, hjust = "left")) +
+  geom_line(size = 0.3) + 
+  geom_smooth() +
+  scale_x_date()
+
+whately_plot
+```
+
+
+## Problem 4
+Modify the restaurant violations Shiny app so that it displays a table of the number of restaurants within a given type of cuisine along with a count of restaurants (as specified by the dba variable. (Hint: Be sure not to double count. The dataset should include 842 unique pizza restaurants in all boroughs and 281 Caribbean restaurants in Brooklyn.)
+
+
+
+```{r echo=FALSE, include=FALSE}
+#Violations
+#ViolationCodes
+#Cuisines
+
+#Join the Cuisines to the Violations dataframe.
+mergedViolations <- Violations %>%
+  right_join(Cuisines)
+
+#mergedViolations
+
+mergedViolations %>% select(dba, boro, cuisine_description) %>% 
+  group_by(cuisine_description) %>% 
+  summarize(n = n_distinct(dba)) %>% 
+  filter(cuisine_description == "Pizza")
+
+mergedViolations %>% select(dba, boro, cuisine_description) %>% 
+  filter(boro == "BROOKLYN") %>% 
+  group_by(cuisine_description) %>% 
+  summarize(n = n_distinct(dba)) %>% 
+  filter(cuisine_description == "Caribbean")
+```
+
+[violations_app](https://lgibson7.shinyapps.io/Violations_App/)
+
+
+
+## Problem 6
+The following code generates a scatterplot with marginal histograms.
+
+```{r}
+library(mosaicData)
+p <- ggplot(HELPrct, aes(x = age, y = cesd)) +
+  geom_point() +
+  theme_classic() +
+  stat_smooth(method = "loess", formula = y ~ x, size = 2)
+ggExtra::ggMarginal(p, type = "histogram", binwidth = 3)
+
+#p
+```
+Find an example where such a display might be useful. Be sure to interpret your graphical display.
+
+## Problem 7
+
+
+Using data from the `palmerpenguins` package, create a Shiny app that displays measurements from the `penguins` dataframe. Allow the user to select a species or a gender, and to choose between various attributes on a scatterplot. (Hint: examples of similar apps can be found at the Shiny gallery).
+
+
+```{r echo=FALSE, include=FALSE}
+penguins
+
+names(penguins)
+
+setdiff(names(iris), "Species")
+
+penguins %>% ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = sex )) +
+  geom_point()
+
+penguins %>%  filter(species == "Adelie") %>% 
+    ggplot( aes(x = bill_length_mm, y = bill_depth_mm, color = sex)) + geom_point()
+```
+
+[Penguin App](https://lgibson7.shinyapps.io/Penguins_App/)
+
+
+## Problem 8
+
+Create a Shiny app to display an interactive time series plot of the `macleish` weather data. Include a selection box to alternate between data from the `whately_2015` and `orchard_2015` weather stations. Add a selector of dates to include in the display. Do you notice any irregularities?
+
+[macleish App](https://lgibson7.shinyapps.io/Macleish_App/)
+

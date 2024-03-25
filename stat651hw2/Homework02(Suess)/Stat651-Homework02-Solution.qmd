@@ -1,0 +1,171 @@
+---
+title: 'Stat. 651 Section 1 or 2: Homework 2'
+output:
+  html_notebook: default
+  word_document: default
+  pdf_document: default
+---
+**Prof. Eric A. Suess**
+
+So how should you complete your homework for this class?
+
+- First thing to do is type all of your information about the problems you complete in the text part of your R Notebook.
+- Second thing to do is type all of your R code into R chunks that can be run.
+- If you load the tidyverse in an R Notebook chunk, be sure to include the "message = FALSE" in the {r}, so {r message = FALSE}.
+- Last thing is to spell check your R Notebook.  Edit > Check Spelling... or hit the F7 key.
+
+
+Using an R Notebook produce your solutions to the following questions. Start by making an R Notebook with file name Lastname_Firstname_Stat651_hw2.Rmd. Then knit the .Rmd file to either Lastname_Firstname_Stat651_hw2.docx. Use your own last name and first name in the filename. At the top of your first page you should include Name, Class, Section, and homework assignment.
+
+The header of your R Notebooks should include
+
+title: "Stat. 651 Homework 2" 
+
+author: "Your name" 
+
+date: "October 31, 2022"
+
+Upload one file to Blackboard.
+
+Instructions: Put all of your R code, .docx, .html, etc. files, and Tableau files into one directory. Zip the directory into a .zip file and then upload it to Blackboard. Make sure the directory has your name it it. Directory name lastname_firstname_Stat651_homework02.
+
+Homework 2:
+
+    - Watch the The beauty of data visualization - David McCandless
+    - Make the plots for the CIACountries data in Tableau.
+
+    - Chapter 14 Exercises Problem 3, Problem 4, Problem 6, Problem 7, Problem 8
+
+\newpage
+
+# In Tableau
+
+Here is the link to my [CIACountries Dashboard](https://public.tableau.com/views/mapwithdots_16668457760050/Sheet1?:language=en-US&:display_count=n&:origin=viz_share_link)
+
+
+The pacman package in R can be used to load many packages at once using the p_load() function. 
+     
+```{r}
+library(pacman)
+
+p_load(tidyverse, macleish, lubridate, mdsr, DT, palmerpenguins)
+```
+
+# Chapter 14 Problem 3
+
+Note that a second date frame can be used to add the seasons to the plot.
+
+```{r}
+whately_2015 %>% select(when, temperature)
+```
+
+```{r}
+seasons_2015 <- tibble(
+    when = (ymd(c("2015 March 20", "2015 June 21", "2015 September 23", "2015 December 21"))),
+    season = c("Spring", "Summer", "Fall", "Winter")
+)
+seasons_2015
+```
+
+
+
+```{r}
+whately_plot <- whately_2015 %>% ggplot(aes(y = temperature, x = as.Date(when))) +
+  geom_vline(data = seasons_2015, color = "darkgray", aes( xintercept = as.Date(when) ) ) +
+  geom_text(data = seasons_2015, aes(y = 33, label = season, hjust = "left")) +
+  geom_line(size = 0.3) + 
+  geom_smooth() +
+  scale_x_date()
+
+whately_plot
+```
+
+# Chapter 14 Problem 4
+
+The Violations dataset is in the mdsr package.  Let look at the tables in the dataset.
+
+
+```{r}
+Violations
+```
+
+```{r}
+ViolationCodes
+```
+
+
+```{r}
+Cuisines
+```
+
+Join the Cuisines to the Violations dataframe.
+
+```{r}
+mergedViolations <- Violations %>%
+  right_join(Cuisines)
+
+mergedViolations
+```
+
+```{r}
+mergedViolations %>% select(dba, boro, cuisine_description) %>% 
+  group_by(cuisine_description) %>% 
+  summarize(n = n_distinct(dba)) %>% 
+  filter(cuisine_description == "Pizza")
+
+mergedViolations %>% select(dba, boro, cuisine_description) %>% 
+  filter(boro == "BROOKLYN") %>% 
+  group_by(cuisine_description) %>% 
+  summarize(n = n_distinct(dba)) %>% 
+  filter(cuisine_description == "Caribbean")
+
+```
+
+Provide the link to your shinyapp.io [violations_app](https://esuess.shinyapps.io/violations/)
+
+# Chapter 14 Problem 6
+
+```{r}
+library(mosaicData)
+p <- HELPrct %>% ggplot(aes(x = age, y = cesd)) +
+    geom_point() +
+    theme_classic() +
+    stat_smooth(method = "loess", formula = y ~ x, size = 2)
+ggExtra::ggMarginal(p, type = "histogram", binwidth = 3)
+```
+
+
+# Chapter 14 Problem 7
+
+
+
+```{r}
+penguins
+```
+
+```{r}
+names(penguins)
+
+setdiff(names(iris), "Species")
+
+penguins %>% ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = sex )) +
+  geom_point()
+```
+
+```{r}
+penguins %>%  filter(species == "Adelie") %>% 
+    ggplot( aes(x = bill_length_mm, y = bill_depth_mm, color = sex)) + geom_point()
+```
+
+[Penguin App](https://esuess.shinyapps.io/penguines/)
+
+
+# Chapter 14 Problem 8
+
+
+
+```{r}
+
+```
+
+

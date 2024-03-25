@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<error xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <code>1</code>
+    <message>Not enough permissions</message>
+    <details>User lydia.gibson@csueastbay.edu does not have 'download' permissions for datasource with url CIACountries (errorCode=1)</details>
+</error>

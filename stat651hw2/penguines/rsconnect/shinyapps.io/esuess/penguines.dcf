@@ -1,0 +1,14 @@
+name: penguines
+title: penguines
+username:
+account: esuess
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7570414
+bundleId: 6492535
+url: https://esuess.shinyapps.io/penguines/
+when: 1667977554.40513
+lastSyncTime: 1667977554.40516
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: penguin_app.R

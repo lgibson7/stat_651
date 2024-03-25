@@ -1,0 +1,152 @@
+---
+title: "Stat. 651 Homework 1"
+author: "Lydia Gibson"
+date: "October 19, 2022"
+format: pdf
+editor: visual
+---
+
+
+```{r install packages}
+library(pacman)
+p_load(tidyverse, macleish, nasaweather, maps, palmerpenguins, mdsr)
+```
+
+
+
+# Problem 4 (Medium):
+
+## The `macleish` package contains weather data collected every 10 minutes in 2015 from two weather stations in Whately, MA.
+
+```{r}
+#library(tidyverse)
+#library(macleish)
+head(whately_2015)
+```
+
+## Using `ggplot2`, create a data graphic that displays the average temperature over each 10-minute interval (`temperature`) as a function of time (`when`).
+
+```{r}
+ggplot(data = whately_2015, mapping = aes(x = when, y = temperature)) +
+  geom_line()
+```
+
+# Problem 8 (Medium):
+
+## Using data from the `nasaweather` package, use the `geom_path` function to plot the path of each tropical storm in the `storms` data table. Use color to distinguish the storms from one another, and use faceting to plot each `year` in its own panel.
+
+```{r view storms}
+#library(nasaweather)
+head(storms)
+
+#storms %>% 
+ # filter(type == "Tropical Storm") 
+```
+```{r latlong}
+bbox <- storms %>%
+  select(lat, long) %>%
+  map_df(range)          # using the purrr R package
+
+bbox
+```
+```{r storms}
+base_map <- map_data("world") %>% ggplot( aes(x = long, y = lat)) +
+  geom_path(aes(group = group), color = "black", size = 0.1) +
+  lims(x = bbox$long, y = bbox$lat)
+
+storms <- storms %>% 
+  unite("the_date", c(year, month, day), sep="-", remove="FALSE") %>%
+  mutate(the_date = lubridate::ymd(the_date))
+
+base_map <- base_map + geom_path(data = storms, aes(color = name, alpha = 0.01, size = wind),
+                     arrow = arrow(length = unit(0.005, "inches"))) +
+  facet_wrap(~year) 
+
+base_map
+```
+
+
+# Problem 9 (Medium):
+
+## Using the `penguins` data set from the `palmerpenguins` package:
+
+```{r penguins}
+#library(palmerpenguins)
+head(penguins)
+```
+
+
+### (a) Create a scatterplot of `bill_length_mm` against `bill_depth_mm` where individual species are colored and a regression line is added to each species. Add regression lines to all of your facets. What do you observe about the association of bill depth and bill length?
+
+```{r penguins1}
+
+p1 <- penguins %>%
+  ggplot(aes(x = bill_length_mm, # set aesthetics for x
+             y = bill_depth_mm, # set aesthetics for y
+             color = species)) + # color by species
+  geom_point() + # create scatter plot
+  geom_smooth(method = 'lm') # add regression line for each species
+
+
+p1
+```
+
+### (b) Repeat the same scatterplot but now separate your plot into facets by `species`. How would you summarize the association between bill depth and bill length.
+
+```{r penguins2}
+p2 <- penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) + #set aesthetics
+  geom_point() + #create scatterplot
+  geom_smooth(method = 'lm') + #add regression line
+  facet_wrap( ~ species) #facet by species
+
+p2
+```
+
+
+
+# Problem 10 (Hard):
+
+## Use the `make_babynames_dist()` function in the `mdsr` package to recreate the "Deadest Names" graphic from FiveThirtyEight (https://fivethirtyeight.com/features/how-to-tell-someones-age-when-all-you-know-is-her-name).
+
+![](deadest_names.png)
+
+```{r head deadest}
+#library(tidyverse)
+#library(mdsr)
+babynames_dist <- make_babynames_dist()
+head(babynames_dist)
+```
+
+```{r deadest names}
+
+deadest <- babynames_dist %>%
+  filter(year >= 1900) %>% #filter by years greater than or equal to 1900
+  group_by(name, sex) %>% # group by name and sex
+  summarise(N = n(), # count observations
+            total_est_alive_today = sum(est_alive_today), #create column of total estimated alive today
+            total = sum(n)) %>% 
+  mutate(percent_dead = 1 - (total_est_alive_today / total)) %>% #create column of percentage dead
+  filter(total > 50000) %>% #filter out rows less than or equal to 50000
+  arrange(desc(percent_dead)) %>% #arrange in descending order by percentage dead
+  group_by(sex) %>% #group by sex
+  top_n(10) #
+
+head(deadest)
+```
+
+
+
+
+
+```{r deadest plot}
+ggplot(deadest, aes(reorder(name, percent_dead), percent_dead, fill = sex)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(y = percent_dead + 0.05), label = paste(round(deadest$percent_dead * 100, 1))) +
+  coord_flip() +
+   ylab("")+
+  xlab("") +
+  labs(title = "Deadest Names")
+```
+
+

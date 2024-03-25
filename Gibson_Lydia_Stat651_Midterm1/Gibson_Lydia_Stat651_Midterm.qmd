@@ -1,0 +1,14 @@
+---
+title: "Stat. 651 Midterm"
+author: "Lydia Gibson"
+format: pdf
+editor: visual
+---
+
+# 1. Find an example of a Shiny App that uses a heatmap. Download the code and get it to work locally on your computer.
+
+[Heatmap](https://lgibson7.shinyapps.io/Problem1/)
+
+# 2. Download the Shiny App that plots the Google Trend Index for five topics. The App is at the bottom or the RStudio Shiny webpage. Here is the github link Google Trend Index App. Get the code to work. Change the topics to other related topics of interest to you. Turn in two R Projects, the original one and the new one that has at least two different topics.
+
+[Google Trends Replaced Data](https://lgibson7.shinyapps.io/Comics/)

@@ -1,0 +1,213 @@
+---
+title: 'Stat. 651 Section 1 or 2: Homework 1'
+author: "Prof. Eric A. Suess"
+format: pdf
+---
+
+So how should you complete your homework for this class?
+
+- First thing to do is type all of your information about the problems you complete in the text part of your Quarto Notebook.
+- Second thing to do is type all of your R code into R chunks that can be run.
+- If you load the tidyverse in an R Notebook chunk, be sure to include the "message = FALSE" in the {r}, so {r message = FALSE}.
+- Last thing is to spell check your R Notebook.  Edit > Check Spelling... or hit the F7 key.
+
+
+Using an Quarto Notebook produce your solutions to the following questions. Start by making an Quarto Notebook with file name Lastname_Firstname_Stat651_hw1.qmd. Then Render the .qmd file to a Lastname_Firstname_Stat651_hw1.pdf. Use your own last name and first name in the filename. At the top of your first page you should include Name, Class, Section, and homework assignment.
+
+The header of your R Notebooks should include
+
+   title: "Stat. 651 Homework 1" 
+   
+   author: "Your name" 
+   
+   date: " October 17, 2022"
+
+Upload one file to Canvas.
+
+Homework 1:
+
+- Chapter 3 Exercises Problem 4, 8, 9, 10
+
+\newpage
+
+# Problem 4 
+
+First note that the temperature variable is the average temperature, in Celsius.
+
+```{r message=FALSE}
+library(tidyverse)
+```
+
+```{r}
+library(macleish)
+whately_2015
+?whately_2015
+```
+
+```{r}
+whately_2015 %>% ggplot(aes(x = when, y = temperature)) +
+  geom_line(color = "darkgrey") +
+  geom_smooth() +
+  xlab(NULL) +
+  ylab("Temperature (degrees Fahrenheit)")
+```
+
+# Problem 8
+
+Which dataframe to use?  storms
+
+```{r}
+library(nasaweather)
+
+head(atmos, 2)	             # Atmospheric data.
+borders <- ungroup(borders)	 # Country borders, ungroup fixes a problem with knitting.
+head(elev, 2)                # Elevation.
+head(glaciers, 2)            # Glacier locations
+head(storms, 2)              # Storm tracks data
+```
+
+```{r}
+p <- storms %>% ggplot(aes(y = wind, x = pressure, color = type)) +
+  geom_point(alpha = 0.3) 
+
+p
+
+p + geom_smooth()
+```
+
+This solution includes how to plot the paths on a map, while the question does not ask for this.  
+
+All storms
+
+```{r}
+library(purrr)
+
+bbox <- storms %>%
+  select(lat, long) %>%
+  map_df(range)
+bbox  
+
+base_map <- map_data("world") %>% ggplot( aes(x = long, y = lat)) +
+  geom_path(aes(group = group), color = "black", size = 0.1) +
+  lims(x = bbox$long, y = bbox$lat)
+
+library(lubridate)
+
+storms2 <- storms %>% 
+  unite(the_date, c(year, month, day), sep = "-", remove = FALSE) %>%
+  mutate(the_date = ymd(the_date))
+
+base_map <- base_map + geom_path(data = storms2, aes(color = name, alpha = 0.01, size = wind),
+                     arrow = arrow(length = unit(0.005, "inches"))) +
+  facet_wrap(~year) 
+
+base_map + theme(legend.position = "none")
+
+```
+
+```{r}
+legend <- cowplot::get_legend(base_map)
+cowplot::plot_grid(legend, scale = .5)
+
+```
+
+Only Tropical Storms
+
+```{r}
+library(purrr)
+
+bbox <- storms %>%
+  select(lat, long) %>%
+  map_df(range)
+bbox  
+
+base_map <- map_data("world") %>% ggplot( aes(x = long, y = lat)) +
+  geom_path(aes(group = group), color = "black", size = 0.1) +
+  lims(x = bbox$long, y = bbox$lat)
+
+base_map
+
+storms3 <- storms2 %>% filter(type == "Tropical Storm") 
+
+base_map + geom_path(data = storms3, aes(color = name, alpha = 0.01), arrow = arrow(length = unit(0.1, "inches"))) +
+  facet_wrap(~year) +
+  theme(legend.position = "none")
+
+base_map + geom_path(data = storms3, aes(color = name, alpha = 0.01, size = wind), arrow = arrow(length = unit(0.005, "inches"))) +
+  facet_wrap(~year) +
+  theme(legend.position = "none")
+
+```
+
+If you have ggmap working, you can try the following code to plot the storms on a Google map.
+
+```{r}
+library(ggmap)
+library(grid)
+
+area <- c(left = -117.3, bottom = -5.7, right = 11, top = 72.7)
+
+storms_plot <- get_stamenmap(area, zoom = 4) %>% 
+  ggmap() +
+  geom_path(aes(x = long, y = lat, alpha = 0.01, col = name, size = wind), data = storms) +
+  facet_wrap(~year)
+
+storms_plot + theme(legend.position = 'None')
+```
+
+# Problem 9
+
+a) The association between *bill depth* and *bill length* is **positive**.
+
+```{r}
+library(palmerpenguins)
+
+head(penguins, 2)
+```
+
+```{r}
+penguins %>% select(bill_length_mm, bill_depth_mm, species) %>% 
+  ggplot(aes(y = bill_length_mm, x = bill_depth_mm, color = species)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+
+b) The association between *bill depth* and *bill length* is **positive** for each species.
+
+```{r}
+penguins %>% select(bill_length_mm, bill_depth_mm, species) %>% 
+  ggplot(aes(y = bill_length_mm, x = bill_depth_mm, color = species)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_wrap(~ species)
+```
+
+# Problem 10
+
+[Deadest Names](https://fivethirtyeight.com/wp-content/uploads/2014/05/silver-feature-names-dead2.png?w=610)
+
+```{r}
+library(mdsr)
+baby_names <- make_babynames_dist()
+```
+
+Note that the dataset ranges from 1900 to 2010, while the visualization was for names up to 2014.  So we will not be able to match the plot.
+
+
+```{r}
+baby_names %>% summarize(range = range(year))
+
+tail(baby_names)
+```
+
+```{r}
+baby_names %>% group_by(sex, name) %>% 
+  summarise( dead = (sum(n - est_alive_today)/sum(n))*100 ) %>% 
+  arrange(desc(dead), .by_group=TRUE) %>% 
+  top_n(10) %>% 
+  ggplot(aes(y = name, x = dead, color = sex)) +
+  geom_bar(stat = "identity") + 
+  facet_grid(sex ~ .)
+```
+ 

@@ -1,0 +1,13 @@
+name: violations
+title: violations
+username:
+account: esuess
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7569819
+bundleId: 6492276
+url: https://esuess.shinyapps.io/violations/
+when: 1667971376.38568
+lastSyncTime: 1667971376.38571
+asMultiple: FALSE
+asStatic: FALSE

@@ -1,0 +1,13 @@
+name: Comics
+title: Comics
+username:
+account: lgibson7
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7821391
+bundleId: 6596078
+url: https://lgibson7.shinyapps.io/Comics/
+when: 1670278276.96062
+lastSyncTime: 1670278276.96063
+asMultiple: FALSE
+asStatic: FALSE

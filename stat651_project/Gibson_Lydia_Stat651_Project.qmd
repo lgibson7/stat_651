@@ -1,0 +1,75 @@
+---
+title: "Stat. 651 Project"
+author: "Lydia Gibson"
+format: pdf
+---
+
+# Project: (due in Canvas Friday December 9, 2022)
+
+Make two statebins using data from FRED US Regioinal Data. Use the socviz Chapter 7 Section 3 as a reference.
+
+
+```{r message=FALSE}
+library(statebins)
+library(tidyverse, readr)
+
+
+```
+
+
+
+# 2022 Oct. Unemployment Rate by State (Percent)
+
+
+```{r warning=FALSE, message=FALSE}
+unemployment <- read_csv('/Users/admin/Desktop/Stat651_DataViz/sta651_assignments/completed assignments/stat651_project/Unemployment.csv')
+
+
+unemployment %>% select("Region Name", "10/1/22") %>%
+  mutate(state = `Region Name`,
+         unemployed = `10/1/22`
+  ) %>% 
+  select( unemployed, state) %>% 
+  ggplot(aes(state = state, fill = unemployed)) +
+geom_statebins() +
+  coord_equal() +   
+  scale_fill_gradient(name = "Unemployment Rate", 
+                      low = munsell::mnsl("5P 7/12"), 
+                      high = munsell::mnsl("5P 2/12")) +
+  ggtitle("2022 October Unemployment Rate by State (%)")  +
+  theme(legend.position = "top")
+
+
+```
+
+
+
+# 2022 October Labor Force Participation Rate by State (Percent)
+
+A state's labor-force participation rate is the number of all employed and unemployed workers divided against the state's civilian population. Differences between monthly seasonally-adjusted and not-seasonally-adjusted labor force participation rates are determined by the seasonal components of the LAUS labor force levels.
+
+
+```{r warning=FALSE, message=FALSE}
+
+labor_force <- read_csv('/Users/admin/Desktop/Stat651_DataViz/sta651_assignments/completed assignments/stat651_project/Labor_Force.csv')
+
+
+labor_force %>% select("Region Name", "10/1/22") %>%
+  mutate(state = `Region Name`,
+         lab_force = `10/1/22`
+  ) %>% 
+  select( lab_force, state) %>% 
+  ggplot(aes(state = state, fill = lab_force)) +
+  geom_statebins() +
+    coord_equal() +
+    scale_fill_gradient(name = "Labor Force Participation", 
+                     low = munsell::mnsl("5P 7/12"), 
+                    high = munsell::mnsl("5P 2/12")) +
+    ggtitle("2022 Oct. Labor Force Participation Rate by State (%)") +
+    theme(legend.position = "top")
+
+  
+
+
+```
+

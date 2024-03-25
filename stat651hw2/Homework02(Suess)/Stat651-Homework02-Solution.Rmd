@@ -1,0 +1,135 @@
+---
+title: 'Stat. 651 Section 1 or 2: Homework 2'
+output:
+  html_notebook: default
+  word_document: default
+  pdf_document: default
+---
+**Prof. Eric A. Suess**
+
+So how should you complete your homework for this class?
+
+- First thing to do is type all of your information about the problems you complete in the text part of your R Notebook.
+- Second thing to do is type all of your R code into R chunks that can be run.
+- If you load the tidyverse in an R Notebook chunk, be sure to include the "message = FALSE" in the {r}, so {r message = FALSE}.
+- Last thing is to spell check your R Notebook.  Edit > Check Spelling... or hit the F7 key.
+
+
+Using an R Notebook produce your solutions to the following questions. Start by making an R Notebook with file name Lastname_Firstname_Stat651_hw2.Rmd. Then knit the .Rmd file to either Lastname_Firstname_Stat651_hw2.docx. Use your own last name and first name in the filename. At the top of your first page you should include Name, Class, Section, and homework assignment.
+
+The header of your R Notebooks should include
+
+title: "Stat. 651 Homework 2" 
+
+author: "Your name" 
+
+date: " November 2, 2020"
+
+Upload one file to Blackboard.
+
+Intructions: Put all of your R code, .docx, .html, etc. files, and Tableau files into one directory. Zip the directory into a .zip file and then upload it to Blackboard. Make sure the directory has your name it it. Directory name lastname_firstname_Stat651_homework02.
+
+Homework 2:
+
+    - Watch the The beauty of data visualization - David McCandless
+    - Make the plots for the CIACountries data in Tableau.
+    - Chapter 11 Exercises 11.1, 11.2, 11.3, 11.4, 11.5, 11.6
+
+\newpage
+
+The pacman package in R can be used to load many packages at once using the p_load() function. 
+     
+```{r}
+library(pacman)
+
+p_load(
+  tidyverse,
+  macleish,
+  lubridate,
+  plotly,
+  dygraphs,
+  ggvis,
+  xts
+)
+```
+
+# 11.1
+
+Note that a second date frame can be used to add the seasons to the plot.
+
+```{r}
+seasons_2015 <- data_frame(
+    when = as.Date(ymd(c("2015 March 20", "2015 June 21", "2015 September 23", "2015 December 21"))),
+    season = c("Spring", "Summer", "Fall", "Winter")
+)
+
+whately_plot <- whately_2015 %>% ggplot(aes(y = temperature, x = as.Date(when))) +
+  geom_vline(data = seasons_2015, color = "darkgray", aes( xintercept = as.numeric(when) ) ) +
+  geom_text(data = seasons_2015, aes(y = 33, label = season, hjust = "left")) +
+  geom_line(size = 0.3) + 
+  geom_smooth() +
+  scale_x_date()
+
+whately_plot
+```
+
+# 11.2
+
+See the Wikipedia pages [2014-2015 North American winter](https://en.wikipedia.org/wiki/2014%E2%80%9315_North_American_winter) and
+[2015-2016 North American winter](https://en.wikipedia.org/wiki/2015%E2%80%9316_North_American_winter)
+
+```{r}
+whately_plot +
+  geom_text(aes(x = as.Date("2015-01-01"), y = 20, label = "Jan. 2015 N. Am. blizzard"), hjust = "left") +
+  geom_text(aes(x = as.Date("2015-11-01"), y = 20, label = "Nov. 2015 Late Nov. ice storm"), hjust = "right")
+```
+
+# 11.3
+
+```{r}
+ggplotly(whately_plot)
+```
+
+# 11.4
+
+The key to working with dygraph is to cover the time series to xts format.  Lead the package xts.  Read this issue with dygraph [How to ensure correct formatting to be able to process a data.frame #17](https://github.com/rstudio/dygraphs/issues/17).
+
+```{r}
+whately_2015
+
+what_date <- whately_2015 %>% 
+  select(when, temperature)
+
+what_date
+
+what_date_xts <- with( what_date, xts(temperature, order.by=when) )
+
+what_date_xts %>%
+  dygraph(main = "Tempurature") %>%
+  dyAxis("y", label = "temperature") %>%
+  dyEvent("1950-6-30", "Korea", labelLoc = "bottom") %>%
+  dyEvent("1965-2-09", "Vietnam", labelLoc = "bottom")
+```
+
+# 11.5
+
+Note:  [ggvis]() is no longer being developed.  Use other tools at this point.
+
+Alternatively, try the [vegalite](https://github.com/hrbrmstr/vegalite) R pckage.  The plot is made when the code is run in the Console.  But note this is rather slow.
+
+```{r eval=FALSE}
+library(vegalite)
+
+vegalite() %>%
+  cell_size(600, 450) %>%
+  add_data(what_date) %>%
+  encode_x("when", "temporal") %>%
+  encode_y("temperature", "quantitative") %>%
+  mark_point()
+
+```
+
+# 11.6
+
+See the folder macleish.  Click on app.R
+

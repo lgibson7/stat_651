@@ -1,0 +1,24 @@
+---
+title: "Stat. 651 Homeowrk 3"
+author: "Lydia Gibson"
+format: html
+editor: visual
+---
+
+**Problems:** - Chapter 17 Exercises Problem 1 - Chapter 18 Exercises Problem 1, Problem 2
+
+# 17.1 Use the geocode function from the tidygeocoder package to find the latitude and longitude of the Emily Dickinson Museum in Amherst, Massachusetts.
+
+# 18.1 Problem 1 (Medium): The Violations data frame in the mdsr package contains information on violations noted in Board of Health inspections of New York City restaurants. These data contain spatial information in the form of addresses and zip codes.
+
+## a. Use the geocode function in tidygeocoder to obtain spatial coordinates for these restaurants.
+
+## b. Using the spatial coordinates you obtained in the previous exercise, create an informative static map using ggspatial that illustrates the nature and extent of restaurant violations in New York City.
+
+## c. Using the spatial coordinates you obtained in the previous exercises, create an informative interactive map using leaflet that illustrates the nature and extent of restaurant violations in New York City.
+
+# 18.2 Problem 2 (Medium):
+
+## a. Use the spatial data in the macleish package and ggspatial to make an informative static map of the MacLeish Field Station property.
+
+## b. Use the spatial data in the macleish package and leaflet to make an informative interactive map of the MacLeish Field Station property.
