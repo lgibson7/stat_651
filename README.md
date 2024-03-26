@@ -1,4 +1,4 @@
-#Stat 651 Assignments
+# Stat 651 Assignments
 
 
 **Data Visualization assignments**
